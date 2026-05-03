@@ -1,12 +1,13 @@
-# docker-fortivpn-socks5 ![](https://https://github.com/Tosainu/docker-fortivpn-socks5/workflows/Build/badge.svg)
+# fortivpn-socks5-container
 
-Connect to a Fortinet SSL-VPN via http/socks5 proxy.
+Connect to a Fortinet SSL-VPN via HTTP/SOCKS5 proxy.  
+Fork of [Tosainu/fortivpn-socks5](https://github.com/Tosainu/docker-fortivpn-socks5) with a GitHub Actions workflow that automatically publishes a new container when a new version of [openfortivpn](https://github.com/adrienverge/openfortivpn) is available.
 
 ## Usage
 
-NOTE: I only tested this image on Linux-based systems. It might not be working on macOS.
+NOTE: I only tested this image on Linux-based systems. It might not work on macOS.
 
-1. Create an openfortivpn configuration file.
+1. Create an openfortivpn configuration file:
 
     ```
     $ cat /path/to/config
@@ -16,7 +17,12 @@ NOTE: I only tested this image on Linux-based systems. It might not be working o
     password = bar
     ```
 
-2. Run the following command to start the container.
+These environment variables are also available:
+
+- `PORT`: set the SOCKS5 proxy port. By default it uses `8443`.
+- `SOCKET_PATH`: when set, the container will also listen on the specified Unix socket (e.g., `/run/fortivpn-to-socks/fortivpn-to-socks.sock`).
+
+2. Run the following command to start the container:
 
     ```
     $ docker container run \
@@ -24,10 +30,10 @@ NOTE: I only tested this image on Linux-based systems. It might not be working o
         --device=/dev/ppp \
         --rm \
         -v /path/to/config:/etc/openfortivpn/config:ro \
-        ghcr.io/tosainu/fortivpn-socks5:master
+        ghcr.io/oskolist/fortivpn-socks5-container:latest
     ```
 
-3. Now you can use SSL-VPN via `http://<container-ip>:8443` or `socks5://<container-ip>:8443`.
+3. Now you can use the SSL-VPN via `http://<container-ip>:8443` or `socks5://<container-ip>:8443`.
 
     ```
     $ http_proxy=http://172.17.0.2:8443 curl http://example.com
@@ -37,4 +43,4 @@ NOTE: I only tested this image on Linux-based systems. It might not be working o
 
 ## License
 
-[MIT](https://github.com/Tosainu/docker-fortivpn-socks5/blob/master/LICENSE)
+[MIT](https://github.com/oskolist/fortivpn-socks5-container/blob/master/LICENSE)
