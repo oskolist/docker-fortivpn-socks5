@@ -57,17 +57,17 @@ jobs:
           #  echo "imageexists=false" >> $GITHUB_OUTPUT
           #  echo "[INFO] Image tag $TAG not found. Proceeding with build..."
           #fi
-      - name: Exit if Version Exists
-        if: steps.variables.outputs.imageexists == 'true'
-        run: exit 0
 
       - name: Set up QEMU
+        if: steps.variables.outputs.imageexists == 'false'
         uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
+        if: steps.variables.outputs.imageexists == 'false'
         uses: docker/setup-buildx-action@v4
 
       - name: Login to GitHub Container Registry
+        if: steps.variables.outputs.imageexists == 'false'
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
@@ -75,6 +75,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker Image
+        if: steps.variables.outputs.imageexists == 'false'
         uses: docker/build-push-action@v7
         with:
           context: .
