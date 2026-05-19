@@ -39,17 +39,24 @@ jobs:
           echo "[INFO] Found latest OpenFortiVPN version: $OPENFORTIVPN_LATEST"
           echo "[INFO] Checking if Image Tag Exists in GHCR..."
           TAG="ghcr.io/$ACTOR/$REPOSITORY:$OPENFORTIVPN_LATEST"
-          # Use HEAD request to check manifest existence
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "$TAG")
-          if [ "$STATUS" -eq 200 ]; then
+          if docker manifest inspect "$TAG" > /dev/null 2>&1; then
+            echo "[INFO] Image tag $TAG already exists. Skipping build..."
             echo "imageexists=true" >> $GITHUB_OUTPUT
-            echo "[INFO] Image tag $TAG already exists. Skipping build."
           else
+            echo "[INFO] Image tag $TAG not found. Proceeding with build..."
             echo "imageexists=false" >> $GITHUB_OUTPUT
-            echo "[INFO] Image tag $TAG not found. Proceeding with build."
           fi
+          # This seems not working:
+          #STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          #  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          #  "$TAG")
+          #if [ "$STATUS" -eq 200 ]; then
+          #  echo "imageexists=true" >> $GITHUB_OUTPUT
+          #  echo "[INFO] Image tag $TAG already exists. Skipping build..."
+          #else
+          #  echo "imageexists=false" >> $GITHUB_OUTPUT
+          #  echo "[INFO] Image tag $TAG not found. Proceeding with build..."
+          #fi
       - name: Exit if Version Exists
         if: steps.variables.outputs.imageexists == 'true'
         run: exit 0
